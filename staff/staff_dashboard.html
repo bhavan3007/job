@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Staff Dashboard</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+  }
+
+  header {
+    background: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  header h1 {
+    font-size: 22px;
+    color: #333;
+  }
+
+  .profile-menu {
+    position: relative;
+    background: #4f46e5;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .profile-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 110%;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    z-index: 99;
+    min-width: 140px;
+    text-align: left;
+  }
+
+  .profile-menu .dropdown a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    font-weight: normal;
+  }
+
+  .profile-menu .dropdown a:hover {
+    background: #f0f0f0;
+  }
+
+  h3 {
+    margin-top: 10px;
+  }
+
+  .summary-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .summary-box {
+  flex: 1;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(43, 29, 29, 0.07);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+
+  #totalTasks {
+    background-color: #2563eb;
+  }
+
+  #pendingTasks {
+    background-color: #facc15;
+  }
+
+  #inProgressTasks {
+    background-color: #60a5fa;
+  }
+
+  #completedTasks {
+    background-color: #10b981;
+  }
+
+  #overdueTasks {
+    background-color: #ef4444;
+  }
+
+  /* Filters */
+  .filter-bar {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    min-width: 200px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  th, td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
+  th {
+    background: #2563eb;
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Adhiyamaan College Of Engineering, <small style="font-size:14px;">Hosur</small></h1>
+    <div class="profile-menu" id="profileTrigger">
+      👤 <span id="principalUserName">Staff</span> ▾
+      <div class="dropdown" id="dropdownMenu">
+        <a href="profile.html">View Profile</a>
+        <a href="../loginpage/index.html" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Summary -->
+  <div class="summary-boxes">
+    <div class="summary-box" id="totalTasks">Total: 0</div>
+    <div class="summary-box" id="pendingTasks">Pending: 0</div>
+    <div class="summary-box" id="inProgressTasks">In Progress: 0</div>
+    <div class="summary-box" id="completedTasks">Completed: 0</div>
+    <div class="summary-box" id="overdueTasks">Overdue: 0</div>
+  </div>
+
+  <h3>📋 Assigned Tasks</h3>
+  <!-- Filters -->
+<div class="filter-bar">
+  <input type="text" id="searchBox" placeholder="🔍 Search..." oninput="filterTable()" />
+  <select id="statusFilter" onchange="filterTable()">
+    <option value="">All Statuses</option>
+    <option>Pending</option>
+    <option>In Progress</option>
+    <option>Completed</option>
+    <option>Overdue</option>
+    <option>Waiting for Principal Action</option>
+  </select>
+</div>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Assigned Date</th>
+        <th>Due Date</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="taskTableBody"></tbody>
+  </table>
+
+  <script>
+    // Load name
+    const user = JSON.parse(localStorage.getItem("user"));
+    const recipientName = localStorage.getItem("recipient_name") || (user && user.name) || localStorage.getItem("username");
+
+    const nameSpan = document.getElementById("principalUserName");
+    if (recipientName) {
+      nameSpan.textContent = recipientName;
+    } else {
+      alert("You are not logged in.");
+      window.location.href = "login.html";
+    }
+
+    // Toggle dropdown
+    const trigger = document.getElementById("profileTrigger");
+    const dropdown = document.getElementById("dropdownMenu");
+
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!trigger.contains(e.target)) {
+        dropdown.style.display = "none";
+      }
+    });
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    // Fetch tasks
+    fetch(`http://localhost/job_api/staff/fetch_tasks.php?username=${encodeURIComponent(recipientName)}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const tbody = document.getElementById("taskTableBody");
+        tbody.innerHTML = "";
+
+        let total = 0, pending = 0, inProgress = 0, completed = 0, overdue = 0;
+        const today = new Date().toISOString().split("T")[0];
+
+        tasks.forEach(task => {
+          total++;
+          if (task.status === "Pending") pending++;
+          else if (task.status === "In Progress") inProgress++;
+          else if (task.status === "Completed") completed++;
+
+          if (task.status !== "Completed" && task.due_date < today) overdue++;
+
+          const row = document.createElement("tr");
+          const assignedDate = task.created_at?.split(" ")[0] || 'N/A';
+
+          row.innerHTML = `
+            <td>${task.title}</td>
+            <td>${assignedDate}</td>
+            <td>${task.due_date}</td>
+            <td>${task.priority}</td>
+            <td>${task.status}</td>
+            <td><a href="task_details.html?task_id=${task.task_id}&recipient_id=${task.recipient_id}">View</a></td>
+          `;
+
+          tbody.appendChild(row);
+        });
+
+        document.getElementById("totalTasks").textContent = `Total: ${total}`;
+        document.getElementById("pendingTasks").textContent = `Pending: ${pending}`;
+        document.getElementById("inProgressTasks").textContent = `In Progress: ${inProgress}`;
+        document.getElementById("completedTasks").textContent = `Completed: ${completed}`;
+        document.getElementById("overdueTasks").textContent = `Overdue: ${overdue}`;
+      })
+      .catch(error => {
+        alert("Error fetching tasks.");
+        console.error(error);
+      });
+ 
+  function filterTable() {
+    const text = document.getElementById('searchBox').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value.toLowerCase();
+
+    document.querySelectorAll("#taskTableBody tr").forEach(row => {
+      const rowText = row.innerText.toLowerCase();
+      const matchText = rowText.includes(text);
+      const matchStatus = !status || rowText.includes(status);
+      row.style.display = matchText && matchStatus ? "" : "none";
+    });
+  }
+
+
+  </script>
+</body>
+</html>

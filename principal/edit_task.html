@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Task</title>
+  <style>
+ /* General Layout */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #fdf2f8, #e0f7fa);
+  padding: 1px;
+  margin: 0;
+  color: #1f2937;
+}
+
+.form-box {
+  max-width: 650px;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
+  padding: 25px;
+  border-radius: 12px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 2px solid #a5b4fc;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding:12px;
+  margin: 1px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: #f0f9ff;
+  transition: border 0.3s ease, background 0.3s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #9333ea;
+  background-color: #ffffff;
+  outline: none;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #7c3aed;
+  display: block;
+  margin-top: 14px;
+}
+
+.btn {
+  background: linear-gradient(135deg, #f472b6, #db2777);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #db2777, #9d174d);
+}
+
+.back-to-dashboard {
+  display: inline-block;
+  margin: 20px auto 0;
+  text-align: center;
+  background: #c7d2fe;
+  color: #3730a3;
+  padding: 8px 2px;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 2px solid #6366f1;
+  transition: background 0.3s ease;
+}
+
+.back-to-dashboard:hover {
+  background: #a5b4fc;
+}
+  </style>
+</head>
+<body>
+<a href="principal_dashboard.html" class="back-to-dashboard">← Back to Dashboard</a>
+<div class="form-box">
+  <h2>Edit Task</h2>
+  <form id="editForm">
+    <label>Title</label>
+    <input type="text" id="title" name="title" required />
+
+    <label>Description</label>
+    <textarea id="description" name="description" required></textarea>
+
+    <label>Priority</label>
+    <select id="priority" name="priority">
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+    </select>
+
+    <label>Due Date</label>
+    <input type="date" id="due_date" name="due_date" required />
+
+    <label>Recipients</label>
+    <div style="display:flex; gap:10px;">
+      <input type="text" id="recipients" name="recipients" readonly />
+      <button type="button" onclick="changeRecipients()">Change</button>
+    </div>
+
+    <label>Upload New Attachment</label>
+    <input type="file" id="attachment" name="attachment" />
+
+    <button class="btn" type="submit">Update Task</button>
+  </form>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const taskId = urlParams.get("task_id");
+
+  if (!taskId) {
+    alert("No task ID found in URL");
+    window.location.href = "principal_dashboard.html";
+  }
+
+  async function loadTaskDetails() {
+    try {
+      const res = await fetch(`http://localhost/job_api/principalbackendapi/get_task.php?task_id=${taskId}`);
+      const data = await res.json();
+
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      document.getElementById('title').value = data.title;
+      document.getElementById('description').value = data.description;
+      document.getElementById('priority').value = data.priority;
+      document.getElementById('due_date').value = data.due_date;
+
+      // ✅ Check for local override first
+      const localRecipients = localStorage.getItem("selected_recipients");
+      if (localRecipients) {
+        const parsed = JSON.parse(localRecipients);
+        document.getElementById("recipients").value = parsed.join(", ");
+        localStorage.removeItem("selected_recipients");
+      } else {
+        const names = data.recipients.map(r => r.recipient_name);
+        document.getElementById("recipients").value = names.join(", ");
+      }
+
+    } catch (err) {
+      alert("Failed to load task data.");
+      console.error(err);
+    }
+  }
+
+  document.getElementById('editForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const recipientsField = document.getElementById("recipients").value.trim();
+    if (!recipientsField) {
+      alert("Recipients cannot be empty!");
+      return;
+    }
+
+    const formData = new FormData(this);
+    formData.append('task_id', taskId);
+
+    const response = await fetch('http://localhost/job_api/principalbackendapi/update_task.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("Task updated successfully!");
+      window.location.href = "principal_dashboard.html";
+    } else {
+      alert("Failed to update task: " + (result.error || 'Unknown error'));
+    }
+  });
+
+  function changeRecipients() {
+    window.location.href = `select_recipients.html?return_to=edit_task.html&task_id=${taskId}`;
+  }
+
+  // ⏳ Delay load to ensure page is ready
+  window.addEventListener("DOMContentLoaded", loadTaskDetails);
+</script>
+
+</body>
+</html>

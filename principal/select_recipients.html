@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Select Recipients</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+    }
+    .modal {
+      max-width: 420px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2563eb;
+    }
+    .step-nav span {
+      margin-right: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #555;
+    }
+    .step-nav span.active {
+      font-weight: 600;
+      color: #2563eb;
+      text-decoration: underline;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .back-link {
+      cursor: pointer;
+      color: #2563eb;
+      text-decoration: underline;
+      margin-bottom: 16px;
+      display: inline-block;
+      font-size: 13px;
+    }
+    .recipient-display {
+      margin-bottom: 16px;
+      padding: 10px;
+      background: #eef2ff;
+      border: 1px solid #2563eb;
+      border-radius: 4px;
+      min-height: 40px;
+    }
+    .recipient-tag {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 4px 8px;
+      margin: 4px 6px 4px 0;
+      border-radius: 4px;
+      cursor: default;
+      font-size: 14px;
+    }
+    .recipient-tag span {
+      margin-left: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="modal">
+    <h2>Select Recipients</h2>
+
+    <div class="step-nav">
+      <span data-step="recipient" class="active">Recipient</span>
+      <span data-step="department">Department</span>
+      <span data-step="faculty">Faculty</span>
+    </div>
+
+    <div id="step-recipient" class="step active">
+      <div id="recipientList"></div>
+    </div>
+
+    <div id="step-department" class="step">
+      <span class="back-link" data-back="recipient">← Back</span>
+      <div id="departmentList"></div>
+    </div>
+
+    <div id="step-faculty" class="step">
+      <span class="back-link" data-back="department">← Back</span>
+      <div id="facultyList"></div>
+    </div>
+
+    <div class="recipient-display" id="recipientDisplay">Recipients: None selected</div>
+    <button class="btn" onclick="confirmSelection()">✅ Confirm and Return</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    let selectedRecipients = [];
+
+    const steps = {
+      recipient: document.getElementById('step-recipient'),
+      department: document.getElementById('step-department'),
+      faculty: document.getElementById('step-faculty')
+    };
+
+    const recipientList = document.getElementById('recipientList');
+    const departmentList = document.getElementById('departmentList');
+    const facultyList = document.getElementById('facultyList');
+    const recipientDisplay = document.getElementById('recipientDisplay');
+
+    function setActiveStep(stepKey) {
+      Object.values(steps).forEach(s => s.classList.remove('active'));
+      steps[stepKey].classList.add('active');
+      document.querySelectorAll('.step-nav span').forEach(el =>
+        el.classList.toggle('active', el.dataset.step === stepKey)
+      );
+    }
+
+    function updateRecipientDisplay() {
+      if (selectedRecipients.length === 0) {
+        recipientDisplay.innerHTML = 'Recipients: None selected';
+        return;
+      }
+
+      recipientDisplay.innerHTML = 'Recipients: ' + selectedRecipients.map((name, i) => `
+        <span class="recipient-tag">${name}<span onclick="removeRecipient(${i})">&times;</span></span>
+      `).join('');
+    }
+
+    function addRecipient(name) {
+      if (!selectedRecipients.includes(name)) {
+        selectedRecipients.push(name);
+        updateRecipientDisplay();
+      }
+    }
+
+    function removeRecipient(index) {
+      selectedRecipients.splice(index, 1);
+      updateRecipientDisplay();
+    }
+
+    function confirmSelection() {
+      if (selectedRecipients.length === 0) {
+        alert("Please select at least one recipient.");
+        return;
+      }
+      localStorage.setItem("selected_recipients", JSON.stringify(selectedRecipients));
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get("return_to") || "edit_task.html";
+      const taskId = params.get("task_id");
+      const redirectURL = `${returnTo}?task_id=${taskId}`;
+      window.location.href = redirectURL;
+    }
+
+    async function loadRecipients() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_recipients.php');
+        recipientList.innerHTML = '';
+        res.data.recipients.forEach(r => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerText = r.name;
+          btn.onclick = () => {
+            if (r.name === 'Department') {
+              setActiveStep('department');
+              loadDepartments();
+            } else if (r.name === 'Dean') {
+              setActiveStep('faculty');
+              loadDeans();
+            } else {
+              addRecipient(r.name);
+              updateRecipientDisplay();
+            }
+          };
+          recipientList.appendChild(btn);
+        });
+      } catch (err) {
+        recipientList.innerText = 'Failed to load recipients';
+      }
+    }
+
+    async function loadDepartments() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_departments.php');
+        departmentList.innerHTML = '';
+        res.data.departments.forEach(d => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerText = d.name;
+          btn.onclick = () => {
+            setActiveStep('faculty');
+            loadFaculties(d.id, d.name);
+          };
+          departmentList.appendChild(btn);
+        });
+      } catch (e) {
+        departmentList.innerText = 'Failed to load departments';
+      }
+    }
+
+    async function loadFaculties(deptId, deptName) {
+      try {
+        const res = await axios.get(`http://localhost/job_api/principalbackendapi/get_faculties.php?department=${encodeURIComponent(deptName)}`);
+        facultyList.innerHTML = '';
+        res.data.faculties.forEach(f => {
+          const label = `${f.name} (${deptName})`;
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerText = label;
+          btn.onclick = () => {
+            addRecipient(label);
+            setActiveStep('recipient');
+          };
+          facultyList.appendChild(btn);
+        });
+      } catch (e) {
+        facultyList.innerText = 'Failed to load faculty';
+      }
+    }
+
+    async function loadDeans() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_deans.php');
+        facultyList.innerHTML = '';
+        res.data.deans.forEach(d => {
+          const label = `${d.name} (Dean)`;
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerText = label;
+          btn.onclick = () => {
+            addRecipient(label);
+            setActiveStep('recipient');
+          };
+          facultyList.appendChild(btn);
+        });
+      } catch (e) {
+        facultyList.innerText = 'Failed to load deans';
+      }
+    }
+
+    document.querySelectorAll('.back-link').forEach(el =>
+      el.addEventListener('click', () => setActiveStep(el.dataset.back))
+    );
+
+    loadRecipients();
+    updateRecipientDisplay();
+  </script>
+</body>
+</html>

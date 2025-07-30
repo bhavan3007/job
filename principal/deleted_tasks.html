@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deleted Tasks</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border: 1px solid #ccc; }
+    .btn { padding: 6px 12px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>🗃️ Deleted Tasks</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th><th>Recipient</th><th>Due Date</th><th>Priority</th><th>Status</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="deletedTaskList"></tbody>
+  </table>
+
+  <script>
+    async function loadDeletedTasks() {
+      try {
+        const res = await fetch('http://localhost/job_api/principalbackendapi/get_deleted_tasks.php');
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.message || "Fetch failed");
+
+        const tbody = document.getElementById('deletedTaskList');
+        tbody.innerHTML = '';
+
+        data.tasks.forEach(task => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${task.title}</td>
+            <td>${task.recipient_name || 'N/A'}</td>
+            <td>${task.due_date}</td>
+            <td>${task.priority}</td>
+            <td>${task.status}</td>
+            <td><button class="btn" onclick="restoreTask(${task.id})">♻️ Restore</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        alert("Error loading deleted tasks");
+        console.error(err);
+      }
+    }
+
+    function restoreTask(id) {
+      if (confirm("Restore this task back to your dashboard?")) {
+        fetch(`http://localhost/job_api/principalbackendapi/restore_task.php?id=${id}`)
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message);
+            loadDeletedTasks();
+          })
+          .catch(err => {
+            alert("Failed to restore task");
+            console.error(err);
+          });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDeletedTasks);
+  </script>
+</body>
+</html>

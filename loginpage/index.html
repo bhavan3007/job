@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to right, #f0e6f6, #e5d4f7);
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      width: 900px;
+      height: 500px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #fff;
+    }
+
+    .form-section h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #4b0082;
+    }
+
+    .form-section p {
+      margin-bottom: 30px;
+      color: #666;
+    }
+
+    select, input {
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #a855f7;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #9333ea;
+    }
+
+    #status {
+      color: red;
+      margin-top: 15px;
+    }
+
+    .image-section {
+      flex: 1;
+      background: url("college.jpg") no-repeat center center;
+      background-size: cover;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="form-section">
+    <h2>Log In</h2>
+    <p>Welcome back! Please enter your details</p>
+
+    <select id="role">
+  <option value="">-- Select Role --</option>
+</select>
+
+
+    <input id="username" type="text" placeholder="your.email@example.com" />
+    <input id="password" type="password" placeholder="Password" />
+    <button id="loginBtn">Log In</button>
+    <a href="#" id="forgotPasswordLink" style="color:#9333ea; font-size:14px;">Forgot Password?</a>
+
+
+    <p id="status"></p>
+  </div>
+
+  <div class="image-section"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="renderer.js"></script>
+
+<div id="forgotModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#00000080; justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:30px; border-radius:10px; width:300px; position:relative;">
+    
+    <!-- ❌ Close Button -->
+    <button 
+      onclick="closeForgotModal()" 
+      style="position:absolute; top:10px; right:12px; background:none; border:none; font-size:20px; color:#666; cursor:pointer;"
+      aria-label="Close Modal"
+      title="Close"
+    >
+      &times;
+    </button>
+
+    <h3 style="margin-top: 10px;">Forgot Password</h3>
+    <input 
+      type="email" 
+      id="forgotEmail" 
+      placeholder="Enter your email" 
+      style="width:100%; padding:8px; margin-top:10px; border:1px solid #ccc; border-radius:5px;"
+    >
+    <button onclick="sendOtp()" style="margin-top:15px;">Send OTP</button>
+    <p id="otpStatus" style="margin-top:10px; font-size:14px;"></p>
+  </div>
+</div>
+
+</div>
+
+
+</body>
+</html>

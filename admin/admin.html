@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Assignment - Admin Dashboard</title>
+  <!-- Tom Select CSS & JS (via CDN) -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+.profile-menu {
+  position: relative;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-menu .dropdown {
+  display: none;
+  position: absolute;
+  top: 130%;
+  right: 0;
+  background: white;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.profile-menu:hover .dropdown {
+  display: block;
+}
+
+.profile-menu .dropdown a {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #1f2937;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.profile-menu .dropdown a:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+
+   .profile-menu {
+  position: relative;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+}
+
+.profile-menu .dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  min-width: 180px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.profile-menu:hover .dropdown {
+  display: block;
+}
+
+.profile-menu .dropdown a {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #1f2937;
+  font-size: 14px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-menu .dropdown a:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.profile-menu .dropdown a i {
+  margin-right: 8px;
+  color: #6b7280;
+}
+
+    
+    .dashboard-section {
+  padding: 2rem;
+}
+
+.overview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  min-height: 70px;
+  color: #1f2937;
+  background-color: #f9fafb;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.icon {
+  padding: 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.6);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.user .icon {
+  background-color: #bfdbfe;
+  color: #1d4ed8;
+}
+.card.department .icon {
+  background-color: #e9d5ff;
+  color: #7e22ce;
+}
+.card.active .icon {
+  background-color: #bbf7d0;
+  color: #15803d;
+}
+.card.inactive .icon {
+  background-color: #fecaca;
+  color: #b91c1c;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+
+/* 2nd row css */
+.task-box {
+  flex: 1 1 220px;
+}
+
+.task-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.75rem;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 70px;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.task-card .icon {
+  font-size: 1.25rem;
+  padding: 0.6rem;
+  border-radius: 9999px;
+  background-color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: inherit;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+  <!-- Header -->
+<header class="bg-white shadow py-4 px-6 flex justify-between items-center z-50 relative">
+  <h1 class="text-xl font-bold text-gray-800">
+    Adhiyamaan College Of Engineering, 
+    <small class="text-sm text-gray-500">Hosur</small>
+  </h1>
+
+  <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-2 bg-indigo-500 text-white px-4 py-2 rounded-full relative">
+      <div class="profile-menu">
+        👤 Admin ▾
+        <div class="dropdown">
+          <a href="profile.html"><i class="fas fa-user mr-2"></i>View Profile</a>
+          <a href="../loginpage/index.html" class="logout-link"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+  <!-- Overview Boxes -->
+  <!-- Overview Boxes -->
+  <main class="dashboard-section">
+<section class="flex flex-wrap gap-4 mb-6">
+  <div class="flex items-center gap-4 bg-blue-50 hover:bg-blue-100 text-blue-700 p-4 rounded-xl shadow-md flex-1 min-w-[220px]">
+    <div class="bg-blue-200 text-blue-800 p-3 rounded-full">
+      <i class="fas fa-users"></i>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-blue-700">Total Users</p>
+      <p id="totalStaff" class="text-xl font-bold text-blue-900">0</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 bg-purple-50 hover:bg-purple-100 text-purple-700 p-4 rounded-xl shadow-md flex-1 min-w-[220px]">
+    <div class="bg-purple-200 text-purple-800 p-3 rounded-full">
+      <i class="fas fa-building"></i>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-purple-700">Total Departments</p>
+      <p id="totalDepartments" class="text-xl font-bold text-purple-900">0</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 bg-green-50 hover:bg-green-100 text-green-700 p-4 rounded-xl shadow-md flex-1 min-w-[220px]">
+    <div class="bg-green-200 text-green-800 p-3 rounded-full">
+      <i class="fas fa-user-check"></i>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-green-700">Active Users</p>
+      <p id="activeUsers" class="text-xl font-bold text-green-900">0</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 bg-red-50 hover:bg-red-100 text-red-700 p-4 rounded-xl shadow-md flex-1 min-w-[220px]">
+    <div class="bg-red-200 text-red-800 p-3 rounded-full">
+      <i class="fas fa-user-times"></i>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-red-700">Inactive Users</p>
+      <p id="inactiveUsers" class="text-xl font-bold text-red-900">0</p>
+    </div>
+  </div>
+</section>
+
+
+
+    <!-- Task Stats Row -->
+<section class="flex flex-wrap gap-4 mb-6">
+  <div class="task-box flex-1 min-w-[220px]">
+    <div class="task-card bg-blue-50 hover:bg-blue-100 text-blue-700">
+      <i class="fas fa-tasks icon"></i>
+      <div>
+        <p class="label">Total Tasks</p>
+        <p id="adminTotalTasks" class="value">0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-box flex-1 min-w-[220px]">
+    <div class="task-card bg-green-50 hover:bg-green-100 text-green-700">
+      <i class="fas fa-check icon"></i>
+      <div>
+        <p class="label">Completed</p>
+        <p id="adminCompleted" class="value">0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-box flex-1 min-w-[220px]">
+    <div class="task-card bg-yellow-50 hover:bg-yellow-100 text-yellow-700">
+      <i class="fas fa-hourglass-half icon"></i>
+      <div>
+        <p class="label">Pending</p>
+        <p id="adminPending" class="value">0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-box flex-1 min-w-[220px]">
+    <div class="task-card bg-red-50 hover:bg-red-100 text-red-700">
+      <i class="fas fa-exclamation-triangle icon"></i>
+      <div>
+        <p class="label">Overdue</p>
+        <p id="adminOverdue" class="value">0</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <!-- Actions -->
+   <section class="flex flex-wrap gap-3 mb-6">
+  <button id="openAddStaffModal" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition duration-200">
+    <i class="fas fa-user-plus"></i> Add New Staff
+  </button>
+
+  <button id="openAddDepartmentModal" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition duration-200">
+    <i class="fas fa-plus"></i> Add New Department
+  </button>
+
+  <button id="openAddGroupModal" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition duration-200">
+    <i class="fas fa-users"></i> Add New Group
+  </button>
+
+  <button id="openViewGroupsModal" class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-medium px-5 py-2.5 rounded-lg shadow transition duration-200">
+    <i class="fas fa-eye"></i> View Groups
+  </button>
+  <button 
+    onclick="window.location.href='reports.html'" 
+    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition-all duration-200">
+    📊 View Reports
+  </button>
+</div>
+</section>
+
+
+    <!-- Staff Table -->
+<section class="bg-white p-6 rounded-xl shadow-lg space-y-6">
+  <!-- Filters -->
+  <div class="flex flex-wrap items-center gap-4">
+    <input id="searchInput" type="text" placeholder="🔍 Search by name..." class="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+    <select id="departmentFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+      <option value="">All Departments</option>
+    </select>
+
+    <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+      <option value="">All Statuses</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+  </div>
+
+  <!-- Staff Table -->
+  <div class="overflow-x-auto rounded-lg border border-gray-200">
+    <table class="min-w-full text-sm text-gray-700">
+      <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
+        <tr>
+          <th class="text-left px-5 py-3">Name</th>
+          <th class="text-left px-5 py-3">Role</th>
+          <th class="text-left px-5 py-3">Department</th>
+          <th class="text-left px-5 py-3">Email</th>
+          <th class="text-left px-5 py-3">Status</th>
+          <th class="text-left px-5 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="staffTable" class="divide-y divide-gray-200 bg-white"></tbody>
+    </table>
+  </div>
+
+  <!-- Add Staff Modal -->
+  <div id="addStaffModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6">➕ Add New Staff</h2>
+      <form id="addStaffForm" class="space-y-5">
+        <input type="text" id="username" placeholder="Username" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="email" id="email" placeholder="Email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="password" id="password" placeholder="Password" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+        <select id="role" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Select Role</option>
+          <option value="principal">Principal</option>
+          <option value="dean">Dean</option>
+          <option value="staff">Staff</option>
+        </select>
+
+        <div id="departmentWrapper">
+          <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+          <select id="department" name="department" required class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="">Select Department</option>
+            <!-- options loaded dynamically -->
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button type="button" onclick="closeStaffModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition">Cancel</button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md shadow transition">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+  </main>
+
+  <!-- Edit Staff Modal -->
+<div id="editStaffModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">✏️ Edit User</h2>
+    <form id="editStaffForm" class="space-y-5">
+      
+      <input type="text" id="edit_username" placeholder="Username" required readonly class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600" />
+
+      <input type="email" id="edit_email" placeholder="Email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+      <input type="password" id="edit_password" placeholder="New Password (leave blank to keep)" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+      <select id="edit_role" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Select Role</option>
+        <option value="principal">Principal</option>
+        <option value="dean">Dean</option>
+        <option value="staff">Staff</option>
+      </select>
+
+      <div id="editDepartmentWrapper">
+        <select id="edit_department" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">Select Department</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" onclick="closeEditStaffModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition">Cancel</button>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md shadow-md transition">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  <!-- Add Department Modal -->
+  <!-- Add Department Modal -->
+<div id="addDepartmentModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">🏢 Add New Department</h2>
+    
+    <form id="addDepartmentForm" class="space-y-5">
+      <input
+        type="text"
+        id="newDepartmentName"
+        placeholder="Department Name"
+        required
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button
+          type="button"
+          onclick="closeDepartmentModal()"
+          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md shadow-md transition"
+        >
+          Add
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Group Modal -->
+<div id="addGroupModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">👥 Create New Group</h2>
+    
+    <form id="addGroupForm" class="space-y-5">
+      <input
+        type="text"
+        id="groupName"
+        placeholder="Group Name"
+        required
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+
+      <select
+        id="groupRecipients"
+        multiple
+        class="w-full px-4 py-2 border border-gray-300 rounded-md h-44 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-400"
+      >
+        <!-- Options will be dynamically inserted -->
+      </select>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button
+          type="button"
+          onclick="closeGroupModal()"
+          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-md shadow-md transition"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Groups Modal -->
+<div id="viewGroupsModal" class="fixed inset-0 bg-black bg-opacity-40 hidden z-50 flex justify-center items-start pt-20">
+  <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-3xl">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 border-b pb-3">
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-users text-purple-600"></i> Created Groups
+      </h2>
+      <button onclick="closeGroupsModal()" class="text-gray-500 hover:text-red-500 text-xl transition">
+        &times;
+      </button>
+    </div>
+
+    <!-- Group List Container -->
+    <div id="groupsListContainer" class="space-y-4 max-h-[400px] overflow-y-auto">
+      <!-- Groups will be dynamically rendered here -->
+    </div>
+    
+  </div>
+</div>
+
+  <!-- JavaScript -->
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f4f6f8;
+    }
+
+  header {
+    background: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  header h1 {
+    font-size: 22px;
+    color: #333;
+  }
+
+  .profile-menu {
+    position: relative;
+    background: #4f46e5;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+
+    .profile-menu .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      z-index: 99;
+    }
+
+    .profile-menu .dropdown a {
+      display: block;
+      padding: 8px;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .profile-menu .dropdown a:hover {
+      background: #f1f1f1;
+    }
+
+    h2 {
+      margin-top: 25px;
+    }
+
+     .summary-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .summary-box {
+  flex: 1;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(43, 29, 29, 0.07);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+
+  #totalTasks {
+    background-color: #2563eb;
+  }
+
+  #pendingTasks {
+    background-color: #facc15;
+  }
+
+  #inProgressTasks {
+    background-color: #60a5fa;
+  }
+
+  #completedTasks {
+    background-color: #10b981;
+  }
+
+  #overdueTasks {
+    background-color: #ef4444;
+  }
+    .back-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #4f46e5;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: #4338ca;
+    }
+
+    .task-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .task-box h3 {
+      margin-top: 0;
+    }
+
+    .task-box p {
+      margin: 8px 0;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 8px 15px;
+      cursor: pointer;
+      border: none;
+      background: #aebbd8;
+      color: white;
+      border-radius: 5px;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .attachment-link {
+      display: block;
+      margin: 5px 0;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .attachment-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <h1>Adhiyamaan College Of Engineering, <small style="font-size:14px;">Hosur</small></h1>
+  <div class="profile-menu" id="profileTrigger">
+    👤 <span id="principalUserName">Staff</span> ▾
+    <div class="dropdown" id="dropdownMenu">
+      <a href="profile.html">View Profile</a>
+      <a href="../loginpage/index.html" onclick="logout()">Logout</a>
+    </div>
+  </div>
+</header>
+
+
+
+<!-- Dashboard Summary -->
+  <div class="summary-boxes">
+    <div class="summary-box" id="totalTasks">Total: 0</div>
+    <div class="summary-box" id="pendingTasks">Pending: 0</div>
+    <div class="summary-box" id="inProgressTasks">In Progress: 0</div>
+    <div class="summary-box" id="completedTasks">Completed: 0</div>
+    <div class="summary-box" id="overdueTasks">Overdue: 0</div>
+  </div>
+
+<!-- Back Button -->
+<a href="staff_dashboard.html" class="back-btn">← Back to Dashboard</a>
+<h2>📌 Task Details</h2>
+
+<!-- Task Info -->
+<div class="task-box">
+  <h3 id="taskTitle">Task Title</h3>
+  <p><strong>Task Description:</strong> <span id="taskdescription"></span></p>
+  <p id="taskCommentContainer" style="display:none;"><strong>Reason:</strong> <span id="taskComment"></span></p>
+  <p><strong>Status:</strong> <span id="taskStatus"></span></p>
+  <p><strong>Due Date:</strong> <span id="dueDate"></span></p>
+  <p><strong>Priority:</strong> <span id="priority"></span></p>
+  <div><strong>Attachment(s):</strong><div id="attachments"></div></div>
+  <br>
+  <button id="acceptBtn" class="hidden">✅ Accept Task</button>
+</div>
+
+<!-- Submission Form -->
+<div class="task-box hidden" id="submissionForm">
+  <h4>📝 Submit Work</h4>
+  <form id="submitForm" enctype="multipart/form-data">
+    <input type="hidden" name="task_id" id="formTaskId">
+    <input type="hidden" name="recipient_id" id="formRecipientId">
+    <label>Description:</label>
+    <textarea name="description" required></textarea><br>
+    <label>Attachments:(Optional)(To attach multiple files click ctrl key while selecting files)</label>
+    <input type="file" name="file[]" multiple>
+    <button type="submit">📤 Submit</button>
+  </form>
+</div>
+
+<!-- Original JS kept untouched below -->
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  const nameSpan = document.getElementById("principalUserName");
+  const recipientName = localStorage.getItem("recipient_name") || (user && user.name) || localStorage.getItem("username");
+
+  if (recipientName) {
+    nameSpan.textContent = recipientName;
+  } else {
+    alert("You are not logged in.");
+    window.location.href = "login.html";
+  }
+
+  const trigger = document.getElementById("profileTrigger");
+  const dropdown = document.getElementById("dropdownMenu");
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!trigger.contains(e.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const taskId = urlParams.get('task_id');
+  const recipientId = urlParams.get('recipient_id');
+
+  fetch(`http://localhost/job_api/staff/fetch_tasks.php?username=${encodeURIComponent(recipientName)}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const today = new Date().toISOString().split("T")[0];
+      const counts = {
+        total: tasks.length,
+        pending: tasks.filter(t => t.status === "Pending").length,
+        inProgress: tasks.filter(t => t.status === "In Progress").length,
+        completed: tasks.filter(t => t.status === "Completed").length,
+        overdue: tasks.filter(t => t.status !== "Completed" && t.due_date < today).length
+      };
+      document.getElementById("totalTasks").textContent = `Total: ${counts.total}`;
+      document.getElementById("pendingTasks").textContent = `Pending: ${counts.pending}`;
+      document.getElementById("inProgressTasks").textContent = `In Progress: ${counts.inProgress}`;
+      document.getElementById("completedTasks").textContent = `Completed: ${counts.completed}`;
+      document.getElementById("overdueTasks").textContent = `Overdue: ${counts.overdue}`;
+
+      console.log("taskId from URL:", taskId, " | recipientId from URL:", recipientId);
+
+const task = tasks.find(t => {
+  console.log("Checking task:", t.task_id, t.recipient_id);
+  return String(t.task_id) === String(taskId) && String(t.recipient_id) === String(recipientId);
+});
+
+if (!task) {
+  console.error("❌ Task not found. Check taskId and recipientId match.");
+  console.log("All tasks fetched:", tasks);
+  alert("Task not found.");
+  return;
+}
+
+      if (!task) return alert("Task not found.");
+
+      document.getElementById("taskTitle").textContent = task.title;
+      document.getElementById("taskdescription").textContent = task.description;
+      if (task.comment && task.comment.trim() !== "") {
+        document.getElementById("taskComment").textContent = task.comment;
+        document.getElementById("taskCommentContainer").style.display = "block";
+      }
+      document.getElementById("taskStatus").textContent = task.status;
+      document.getElementById("dueDate").textContent = task.due_date;
+      document.getElementById("priority").textContent = task.priority;
+      document.getElementById("formTaskId").value = task.task_id;
+      document.getElementById("formRecipientId").value = task.recipient_id;
+
+      const attachmentContainer = document.getElementById("attachments");
+      attachmentContainer.innerHTML = "";
+
+      if (task.attachment) {
+        const files = task.attachment.split(',');
+        files.forEach((filePath, i) => {
+          const link = document.createElement("a");
+          link.href = `http://localhost/job_api/${filePath.trim()}`;
+          link.textContent = `📎 Attachment ${i + 1}`;
+          link.className = "attachment-link";
+          link.target = "_blank";
+          attachmentContainer.appendChild(link);
+        });
+      } else {
+        attachmentContainer.textContent = "No attachment";
+      }
+
+      if (task.status === "Pending") {
+        document.getElementById("acceptBtn").classList.remove("hidden");
+      } else {
+        fetch(`http://localhost/job_api/staff/fetch_submission.php?task_id=${task.task_id}&recipient_id=${task.recipient_id}`)
+          .then(res => res.json())
+          .then(submission => {
+            if (submission && submission.description) {
+              showPreviousSubmission(submission, task.status);
+            } else if (task.status === "In Progress") {
+              document.getElementById("submissionForm").classList.remove("hidden");
+            }
+          });
+      }
+    });
+
+  function showPreviousSubmission(submission, status) {
+    const container = document.createElement("div");
+    container.className = "task-box";
+    container.innerHTML = `
+      <h4>📦 Previous Submission</h4>
+      <p><strong>Description:</strong> ${submission.description}</p>
+      <div><strong>Submitted Files:</strong><br></div>
+    `;
+
+    const fileSection = document.createElement("div");
+    const files = submission.attachments ? submission.attachments.split(',') : [];
+    files.forEach((filePath, i) => {
+      const link = document.createElement("a");
+      link.href = `http://localhost/job_api/${filePath.trim()}`;
+      link.textContent = `📎 File ${i + 1}`;
+      link.className = "attachment-link";
+      link.target = "_blank";
+      fileSection.appendChild(link);
+    });
+
+    container.appendChild(fileSection);
+
+    if (status !== "Completed") {
+      const resubmitBtn = document.createElement("button");
+      resubmitBtn.textContent = "🔁 Resubmit";
+      resubmitBtn.style.marginTop = "10px";
+      resubmitBtn.onclick = () => {
+        document.getElementById("submissionForm").classList.remove("hidden");
+        container.style.display = "none";
+      };
+      container.appendChild(resubmitBtn);
+    }
+
+    document.querySelector('.task-box').after(container);
+  }
+
+  document.getElementById("acceptBtn").addEventListener("click", () => {
+    fetch("http://localhost/job_api/staff/accept_task.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `recipient_id=${recipientId}`
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert("Task accepted.");
+          document.getElementById("acceptBtn").classList.add("hidden");
+          document.getElementById("taskStatus").textContent = "In Progress";
+          document.getElementById("submissionForm").classList.remove("hidden");
+        } else {
+          alert("Failed to accept task.");
+        }
+      });
+  });
+
+  document.getElementById("submitForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append("title", document.getElementById("taskTitle").textContent);
+    formData.append("resubmission", "1");
+
+    fetch("http://localhost/job_api/staff/submit_task.php", {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert("Submitted successfully.");
+          document.getElementById("taskStatus").textContent = "Waiting for Principal Action";
+          document.getElementById("submissionForm").classList.add("hidden");
+          location.reload();
+        } else {
+          alert("Submission failed.");
+        }
+      });
+  });
+
+  setInterval(() => {
+    fetch(`http://localhost/job_api/staff/fetch_tasks.php?username=${encodeURIComponent(recipientName)}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const task = tasks.find(t => String(t.task_id) === taskId && String(t.recipient_id) === recipientId);
+        if (task) {
+          document.getElementById("taskStatus").textContent = task.status;
+        }
+      });
+  }, 10000);
+</script>
+
+</body>
+</html>

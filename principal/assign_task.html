@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Allocate Task</title>
+  <style>
+/* General Layout */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #f0f4ff, #e1f7f5);
+  margin: 0;
+  color: #1f2937;
+}
+
+.modal {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #3b82f6;
+  font-size: 26px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.step-nav span.active {
+  font-weight: bold;
+  color: #10b981;
+  position: relative;
+}
+
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.option-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fef9c3, #fff);
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+  font-size: 15px;
+  font-weight: 500;
+  color: #92400e;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.option-btn:hover {
+  background-color: #fde68a;
+}
+
+.back-link {
+  cursor: pointer;
+  color: #3b82f6;
+  text-decoration: underline;
+  margin-bottom: 20px;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.recipient-display {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #ecfccb;
+  border: 1px solid #84cc16;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #365314;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #1e40af;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: #f8fafc;
+  transition: border 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: #ffffff;
+  transition: background 0.3s ease;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+}
+
+#status {
+  margin-top: 12px;
+  text-align: center;
+  color: #10b981;
+  font-size: 14px;
+}
+
+.back-to-dashboard {
+  display: inline-block;
+  margin: 20px auto 0;
+  text-align: center;
+  background: #ede9fe;
+  color: #7c3aed;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 1px solid #7c3aed;
+  transition: background 0.3s ease;
+}
+
+.back-to-dashboard:hover {
+  background: #ddd6fe;
+}
+
+.recipient-chip {
+  background: #fcd34d;
+  color: #78350f;
+  padding: 6px 12px;
+  margin: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.recipient-chip:hover {
+  background: #fde68a;
+}
+
+#departmentList.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+#departmentList.department-grid .option-btn {
+  width: auto;
+  margin-bottom: 0;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  background: linear-gradient(to top left, #e0f2fe, #ffffff);
+  border: 1px solid #38bdf8;
+  color: #0c4a6e;
+}
+
+#departmentList.department-grid .option-btn:hover {
+  background: #bae6fd;
+}
+
+  </style>
+</head>
+<body>
+  <a href="principal_dashboard.html" class="back-to-dashboard">← Back to Dashboard</a>
+
+  <div class="modal">
+    <h2>Allocate New Task</h2>
+    <div class="step-nav" id="stepNav">
+      <span data-step="recipient" class="active">Recipient</span>
+      <span data-step="department">Department</span>
+      <span data-step="faculty">Faculty</span>
+      <span data-step="allocate">Allocate</span>
+    </div>
+
+    <div id="step-recipient" class="step active">
+      <div id="recipientList"></div>
+    </div>
+
+    <div id="step-department" class="step">
+      <span class="back-link" data-back="recipient">← Back</span>
+      <div id="departmentList"></div> </div>
+
+    <div id="step-faculty" class="step">
+      <span class="back-link" data-back="department">← Back</span>
+      <div id="facultyList"></div>
+    </div>
+
+    <div id="step-allocate" class="step">
+      <span class="back-link" data-back="recipient">← Dashboard</span>
+      <div class="recipient-display" id="recipientDisplay">Recipients: None selected</div>
+      <form id="allocateForm">
+        <input type="hidden" id="recipientHidden" name="recipients">
+        <div class="form-group">
+          <label>Task Title</label>
+          <input type="text" id="taskTitle" name="title" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="taskDesc" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Upload Documents (Optional)(To attach multiple files click ctrl key while selecting files)</label>
+          <input type="file" id="taskFile" name="attachments[]" multiple>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="priority" name="priority" required>
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="dueDate" name="due_date" required>
+        </div>
+        <button type="submit" class="btn">Allocate Task</button>
+        <div id="status"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    let selectedRecipients = [];
+
+    const steps = {
+      recipient: document.getElementById('step-recipient'),
+      department: document.getElementById('step-department'),
+      faculty: document.getElementById('step-faculty'),
+      allocate: document.getElementById('step-allocate')
+    };
+    const stepNav = document.getElementById('stepNav');
+    const recipientList = document.getElementById('recipientList');
+    const departmentList = document.getElementById('departmentList');
+    const facultyList = document.getElementById('facultyList');
+    const recipientDisplay = document.getElementById('recipientDisplay');
+    const recipientHidden = document.getElementById('recipientHidden');
+    const allocateForm = document.getElementById('allocateForm');
+    const statusEl = document.getElementById('status');
+
+    function setActiveStep(key) {
+      Object.values(steps).forEach(el => el.classList.remove('active'));
+      steps[key].classList.add('active');
+      stepNav.querySelectorAll('span').forEach(el => el.classList.toggle('active', el.dataset.step === key));
+    }
+
+    function updateRecipientDisplay() {
+      if (selectedRecipients.length === 0) {
+        recipientDisplay.innerText = 'Recipients: None selected';
+        recipientHidden.value = '';
+        return;
+      }
+      recipientDisplay.innerHTML = 'Recipients: ' + selectedRecipients.map((r, i) =>
+        `<span class="recipient-chip" onclick="removeRecipient(${i})">${r} ✖</span>`
+      ).join(' ');
+      recipientHidden.value = JSON.stringify(selectedRecipients);
+    }
+
+    function removeRecipient(index) {
+      selectedRecipients.splice(index, 1);
+      updateRecipientDisplay();
+    }
+
+    async function loadRecipients() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_recipients.php');
+        recipientList.innerHTML = ''; // Clear existing buttons before adding new ones
+        res.data.recipients.forEach(r => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn'; // Keep original option-btn class for vertical stacking
+          btn.innerText = r.name;
+          btn.addEventListener('click', () => {
+            if (r.name === 'Department') {
+              setActiveStep('department');
+              loadDepartments();
+            } else if (r.name === 'Dean') {
+              setActiveStep('faculty');
+              loadDeans();
+
+            } 
+            else if (r.name === 'Groups') {
+  setActiveStep('faculty');
+  loadGroups(); // Reuse faculty step to display groups
+}
+
+            
+            else {
+              if (!selectedRecipients.includes(r.name)) {
+                selectedRecipients.push(r.name);
+                updateRecipientDisplay();
+              }
+              setActiveStep('allocate');
+            }
+          });
+          recipientList.appendChild(btn);
+        });
+      } catch (e) {
+        recipientList.innerText = 'Failed to load recipients';
+      }
+    }
+
+    async function loadDepartments() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_departments.php');
+        departmentList.innerHTML = ''; // Clear previous content
+
+        // Add the specific class to the departmentList container
+        departmentList.classList.add('department-grid');
+
+        res.data.departments.forEach(d => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn'; // Still use option-btn, but its styling will be overridden by #departmentList.department-grid .option-btn
+          btn.innerText = d.name;
+          btn.addEventListener('click', () => {
+            setActiveStep('faculty');
+            loadFaculties(d.id, d.name);
+          });
+          departmentList.appendChild(btn); // Append button directly to departmentList
+        });
+      } catch (e) {
+        departmentList.innerText = 'Failed to load departments';
+      }
+    }
+
+    async function loadFaculties(id, deptName) {
+      try {
+        const res = await axios.get(`http://localhost/job_api/principalbackendapi/get_faculties.php?department=${encodeURIComponent(deptName)}`);
+        facultyList.innerHTML = '';
+        facultyList.classList.remove('department-grid'); // Ensure faculty list doesn't get department grid styling
+
+        res.data.faculties.forEach(f => {
+          const label = `${f.name} (${deptName})`;
+          const btn = document.createElement('button');
+          btn.className = 'option-btn'; // Keep original option-btn class for vertical stacking
+          btn.innerText = label;
+          btn.addEventListener('click', () => {
+            if (!selectedRecipients.includes(label)) {
+              selectedRecipients.push(label);
+              updateRecipientDisplay();
+            }
+            setActiveStep('allocate');
+          });
+          facultyList.appendChild(btn);
+        });
+      } catch (e) {
+        facultyList.innerText = 'Failed to load faculty';
+      }
+    }
+
+    async function loadDeans() {
+      try {
+        const res = await axios.get('http://localhost/job_api/principalbackendapi/get_deans.php');
+        facultyList.innerHTML = '';
+        facultyList.classList.remove('department-grid'); // Ensure faculty list doesn't get department grid styling
+
+        res.data.deans.forEach(d => {
+          const label = `${d.name} (Dean)`;
+          const btn = document.createElement('button');
+          btn.className = 'option-btn'; // Keep original option-btn class for vertical stacking
+          btn.innerText = d.name;
+          btn.addEventListener('click', () => {
+            if (!selectedRecipients.includes(label)) {
+              selectedRecipients.push(label);
+              updateRecipientDisplay();
+            }
+            setActiveStep('allocate');
+          });
+          facultyList.appendChild(btn);
+        });
+      } catch (e) {
+        facultyList.innerText = 'Failed to load deans';
+      }
+    }
+
+    document.querySelectorAll('.back-link').forEach(el =>
+      el.addEventListener('click', () => {
+        const backTarget = el.dataset.back;
+        setActiveStep(backTarget);
+        // When going back from department, remove the grid class
+        if (backTarget === 'recipient') {
+            departmentList.classList.remove('department-grid');
+        }
+        // When going back from faculty, ensure faculty doesn't have grid class (though it shouldn't have)
+        if (backTarget === 'department') {
+            facultyList.classList.remove('department-grid');
+        }
+      })
+    );
+
+    allocateForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('title', document.getElementById('taskTitle').value);
+      formData.append('description', document.getElementById('taskDesc').value);
+      formData.append('priority', document.getElementById('priority').value);
+      formData.append('due_date', document.getElementById('dueDate').value);
+      formData.append('recipients', JSON.stringify(selectedRecipients));
+
+      const files = document.getElementById('taskFile').files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('attachments[]', files[i]);
+      }
+
+      try {
+        const res = await axios.post('http://localhost/job_api/principalbackendapi/assign_task.php', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        statusEl.innerText = 'Task allocated successfully!';
+        allocateForm.reset();
+        selectedRecipients = [];
+        updateRecipientDisplay();
+        // Reset the view to recipient and remove grid class from department on successful allocation
+        setActiveStep('recipient');
+        departmentList.classList.remove('department-grid');
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = 'Allocation failed!';
+      }
+    });
+
+    setActiveStep('recipient');
+    loadRecipients();
+    async function loadGroups() {
+  try {
+    const res = await axios.get('http://localhost/job_api/principalbackendapi/get_groups.php');
+    facultyList.innerHTML = '';
+    facultyList.classList.remove('department-grid');
+
+    res.data.groups.forEach(g => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = g.name;
+      btn.addEventListener('click', () => loadGroupMembers(g.id));
+      facultyList.appendChild(btn);
+    });
+  } catch (e) {
+    facultyList.innerText = 'Failed to load groups';
+  }
+}
+async function loadGroupMembers(groupId) {
+  try {
+    const res = await axios.get(`http://localhost/job_api/principalbackendapi/get_group_members.php?group_id=${groupId}`);
+    if (res.data.members?.length) {
+      res.data.members.forEach(member => {
+        if (!selectedRecipients.includes(member)) {
+          selectedRecipients.push(member);
+        }
+      });
+      updateRecipientDisplay();
+      setActiveStep('allocate');
+    } else {
+      alert("No members found in this group.");
+    }
+  } catch (e) {
+    alert("Failed to fetch group members.");
+  }
+}
+
+  </script>
+</body>
+</html>

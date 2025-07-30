@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verify OTP</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #9333ea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    p { font-size: 14px; color: red; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h3>Verify OTP</h3>
+  <input id="otpInput" type="text" placeholder="Enter OTP" />
+  <button onclick="verifyOtp()">Verify</button>
+  <p id="message"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+async function verifyOtp() {
+  const otp = document.getElementById("otpInput").value.trim();
+  const email = localStorage.getItem("otpEmail");
+  const message = document.getElementById("message");
+
+  if (!otp || !email) {
+    message.textContent = "Missing email or OTP.";
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost/job_api/forgot_password/verify_otp.php", {
+      email, otp
+    });
+
+    if (res.data.success) {
+      window.location.href = "reset_password.html";
+    } else {
+      message.textContent = res.data.message;
+    }
+  } catch (err) {
+    message.textContent = "Server error. Try again.";
+  }
+}
+</script>
+
+</body>
+</html>

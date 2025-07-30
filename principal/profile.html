@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile - TaskFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between">
+    <div class="flex items-center">
+      <h1 class="text-2xl font-bold text-gray-800 mr-2">TaskFlow</h1>
+      <span class="text-gray-500 text-sm">My Profile</span>
+    </div>
+  </header>
+
+  <!-- Profile Section -->
+  <main class="flex-grow p-6 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <div class="flex flex-col items-center mb-6">
+        <!-- Initials -->
+        <div id="initial" class="w-24 h-24 bg-indigo-600 text-white flex items-center justify-center rounded-full text-4xl font-semibold mb-4">
+          ?
+        </div>
+        <h2 id="fullName" class="text-2xl font-bold text-gray-800">Loading...</h2>
+        <p id="roleText" class="text-gray-600">Role</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-1">Email Address</label>
+          <p id="emailText" class="text-gray-900 bg-gray-50 p-3 rounded-md border border-gray-200">Loading...</p>
+        </div>
+        <div>
+          <label class="block text-gray-700 text-sm font-medium mb-1">Role</label>
+          <p id="roleBox" class="text-gray-900 bg-gray-50 p-3 rounded-md border border-gray-200">Loading...</p>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="principal_dashboard.html" class="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200">
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user || !user.email) {
+        alert("You're not logged in. Redirecting...");
+        window.location.href = "../loginpage/index.html";
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost/job_api/get_profile.php?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          const { username, email, role } = data.user;
+
+          document.getElementById("initial").textContent = username.charAt(0).toUpperCase();
+          document.getElementById("fullName").textContent = username;
+          document.getElementById("emailText").textContent = email;
+          document.getElementById("roleBox").textContent = role.charAt(0).toUpperCase() + role.slice(1);
+          document.getElementById("roleText").textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        } else {
+          alert("Failed to load profile.");
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        alert("Something went wrong.");
+      }
+    });
+  </script>
+</body>
+</html>
